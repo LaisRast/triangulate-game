@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Circle, Layer, Line, Rect, Stage, Text } from 'react-konva';
+import { GAME_CONFIG } from './config/gameConfig.ts';
 import type { Edge, Player, Point, Triangle } from './types';
 import { canDrawMoreEdges, doLinesIntersect, generateRandomPoints, isPointInTriangle } from './utils/geometry.tsx';
 
@@ -23,7 +24,10 @@ const Game = () => {
   const [scores, setScores] = useState<number[]>(Array(numPlayers).fill(0));
 
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({ width: 800, height: 500 });
+  const [canvasSize, setCanvasSize] = useState<{ width: number; height: number }>({
+    width: GAME_CONFIG.CANVAS.DEFAULT_WIDTH,
+    height: GAME_CONFIG.CANVAS.DEFAULT_HEIGHT,
+  });
   const [gameOver, setGameOver] = useState<boolean>(false);
 
   const players = [...PLAYERS].slice(0, numPlayers);
@@ -35,13 +39,13 @@ const Game = () => {
   };
 
   const handleNumberOfPointsChange = (newNumberOfPoints: number) => {
-    setNumPoints(Math.min(newNumberOfPoints, 50));
+    setNumPoints(Math.max(GAME_CONFIG.POINTS.MIN_COUNT, Math.min(newNumberOfPoints, GAME_CONFIG.POINTS.MAX_COUNT)));
     initializeGame();
   };
 
   const initializeGame = () => {
-    const width = Math.min(window.innerWidth - 40, 800);
-    const height = 500;
+    const width = Math.min(window.innerWidth - 40, GAME_CONFIG.CANVAS.DEFAULT_WIDTH);
+    const height = GAME_CONFIG.CANVAS.DEFAULT_HEIGHT;
     setCanvasSize({ width, height });
     setPoints(generateRandomPoints(numPoints, width, height));
     setEdges([]);
@@ -81,9 +85,9 @@ const Game = () => {
       }
 
       const intersecting = edges.some((edge) => {
-        const edgePoint1Id = points[edge.point1Id];
-        const edgePoint2Id = points[edge.point2Id];
-        return doLinesIntersect(points[selectedPoint1Id], points[selectedPoint2Id], edgePoint1Id, edgePoint2Id);
+        const edgePoint1 = points[edge.point1Id];
+        const edgePoint2 = points[edge.point2Id];
+        return doLinesIntersect(points[selectedPoint1Id], points[selectedPoint2Id], edgePoint1, edgePoint2);
       });
       if (intersecting) {
         setErrorMessage('Edge intersects an existing edge.');
@@ -307,8 +311,8 @@ const Game = () => {
             <input
               type="number"
               value={numPoints}
-              min={3}
-              max={50}
+              min={GAME_CONFIG.POINTS.MIN_COUNT}
+              max={GAME_CONFIG.POINTS.MAX_COUNT}
               onChange={(e) => handleNumberOfPointsChange(Number(e.target.value))}
               style={{ width: 100, margin: 0 }}
             />
@@ -318,7 +322,12 @@ const Game = () => {
           </button>
         </div>
         <div style={{ marginTop: 16 }}>
-          <a href="https://github.com/LaisRast/triangulate-game" target="_blank" referrerPolicy="no-referrer">
+          <a
+            href="https://github.com/LaisRast/triangulate-game"
+            target="_blank"
+            rel="noopener noreferrer"
+            referrerPolicy="no-referrer"
+          >
             Source Code
           </a>
         </div>

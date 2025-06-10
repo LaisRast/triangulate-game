@@ -1,10 +1,17 @@
+import { GAME_CONFIG } from '../config/gameConfig.ts';
 import type { Edge, Point } from '../types';
 
-const determinate = (point1: Point, point2: Point, point3: Point) => {
+const determinant = (point1: Point, point2: Point, point3: Point) => {
   return (point2.x - point1.x) * (point3.y - point1.y) - (point3.x - point1.x) * (point2.y - point1.y);
 };
 
 export const generateRandomPoints = (count: number, width: number, height: number): Point[] => {
+  if (count > GAME_CONFIG.POINTS.MAX_COUNT) {
+    count = GAME_CONFIG.POINTS.MAX_COUNT;
+  }
+  if (count < GAME_CONFIG.POINTS.MIN_COUNT) {
+    count = GAME_CONFIG.POINTS.MIN_COUNT;
+  }
   const minDist = 40;
   const points: Point[] = [];
   while (points.length < count) {
@@ -26,9 +33,9 @@ export const isPointInTriangle = (
   trianglePoint2: Point,
   trianglePoint3: Point
 ): boolean => {
-  const orientationWith12 = determinate(point, trianglePoint1, trianglePoint2);
-  const orientationWith23 = determinate(point, trianglePoint2, trianglePoint3);
-  const orientationWith31 = determinate(point, trianglePoint3, trianglePoint1);
+  const orientationWith12 = determinant(point, trianglePoint1, trianglePoint2);
+  const orientationWith23 = determinant(point, trianglePoint2, trianglePoint3);
+  const orientationWith31 = determinant(point, trianglePoint3, trianglePoint1);
 
   const hasPositiveOrientation = orientationWith12 > 0 || orientationWith23 > 0 || orientationWith31 > 0;
   const hasNegativeOrientation = orientationWith12 < 0 || orientationWith23 < 0 || orientationWith31 < 0;
@@ -38,8 +45,8 @@ export const isPointInTriangle = (
 
 export const doLinesIntersect = (point1: Point, point2: Point, point3: Point, point4: Point): boolean => {
   return (
-    determinate(point1, point2, point3) * determinate(point1, point2, point4) < 0 &&
-    determinate(point3, point4, point1) * determinate(point3, point4, point2) < 0
+    determinant(point1, point2, point3) * determinant(point1, point2, point4) < 0 &&
+    determinant(point3, point4, point1) * determinant(point3, point4, point2) < 0
   );
 };
 
