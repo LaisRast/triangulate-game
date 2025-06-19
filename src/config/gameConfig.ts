@@ -1,7 +1,7 @@
 export const GAME_CONFIG = {
   POINTS: {
-    MIN_COUNT: 3,
-    MAX_COUNT: 50,
+    MIN_COUNT: 1,
+    MAX_COUNT: 30,
     MIN_DISTANCE: 40,
   },
   CANVAS: {
